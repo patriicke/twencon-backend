@@ -12,7 +12,9 @@ const UserSchema = new mongoose.Schema(
       type: String,
       lowercase: true,
       unique: true,
-      required: [true, "Invalid email"]
+      required: [true, "Can't be blank"],
+      validate: [isEmail, "Invalid email"],
+      index: true
     },
     password: {
       type: String,
@@ -22,7 +24,8 @@ const UserSchema = new mongoose.Schema(
       type: String
     },
     newMessages: {
-      type: Object
+      type: Object,
+      default: {}
     },
     status: {
       type: String,
@@ -33,6 +36,38 @@ const UserSchema = new mongoose.Schema(
     minimize: false
   }
 );
+
+UserSchema.pre("save", function (next) {
+  const user = this;
+  if (!user.isModified("password")) return next();
+
+  bcrypt.genSalt(10, function (err, salt) {
+    if (err) return next(err);
+
+    bcrypt.hash(user.password, salt, function (err, hash) {
+      if (err) return next(err);
+
+      user.password = hash;
+      next();
+    });
+  });
+});
+
+UserSchema.methods.toJSON = function () {
+  const user = this;
+  const userObject = user.toObject();
+  delete userObject.password;
+  return userObject;
+};
+
+UserSchema.statics.findByCredentials = async function (email, password) {
+  const user = await User.findOne({ email });
+  if (!user) throw new Error(`Invalid email or password`);
+  const isMatch = await bcrypt.compare(password, user.password);
+  if (!isMatch) throw new Error(`Invalid email or password`);
+
+  return user;
+};
 
 const User = mongoose.model("User", UserSchema);
 
