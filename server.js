@@ -91,6 +91,9 @@ io.on("connection", (socket) => {
   });
 });
 
+app.use("*", (req, res) => {
+  res.status(404).json({ message: "Invalid endpoint" });
+});
 server.listen(PORT, () => {
   console.log(`Server is running on localhost:`, PORT);
 });
