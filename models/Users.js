@@ -2,43 +2,51 @@ const mongoose = require("mongoose");
 const { isEmail } = require("validator");
 const bcrypt = require("bcrypt");
 
-const UserSchema = new mongoose.Schema({
-  fname: {
-    type: String,
-    required: [true, "Can't be blank"]
+const UserSchema = new mongoose.Schema(
+  {
+    fullname: {
+      type: String,
+      required: [true, "Full Name can't be empty"]
+    },
+    email: {
+      type: String,
+      lowercase: true,
+      unique: true,
+      required: [true, "Email can't be empty"],
+      validate: [isEmail, "Try using a valid email please"],
+      index: true
+    },
+    username: {
+      type: String,
+      required: [true, "Telephone can't be empty"]
+    },
+    password: {
+      type: String,
+      required: [true, "Telephone can't be empty"]
+    },
+    profile: {
+      type: String
+    },
+    newMessages: {
+      type: Object,
+      default: {}
+    },
+    status: {
+      type: String,
+      default: "online"
+    },
+    telephone: {
+      type: String,
+      required: [true, "telephone can't be empty"]
+    },
+    refreshToken: {
+      type: String
+    }
   },
-  lname: {
-    type: String,
-    required: [true, "Can't be blank"]
-  },
-  username: {
-    type: String,
-    required: [true, "Can't be black"]
-  },
-  email: {
-    type: String,
-    lowercase: true,
-    unique: true,
-    required: [true, "Can't be blank"],
-    validate: [isEmail, "Invalid email"],
-    index: true
-  },
-  password: {
-    type: String,
-    required: [true, "Can't be blank"]
-  },
-  profile: {
-    type: String
-  },
-  newMessages: {
-    type: Object,
-    default: {}
-  },
-  status: {
-    type: String,
-    default: "online"
+  {
+    minimize: false
   }
-});
+);
 
 UserSchema.pre("save", function (next) {
   const user = this;
@@ -57,6 +65,7 @@ UserSchema.methods.toJSON = function () {
   const user = this;
   const userObject = user.toObject();
   delete userObject.password;
+  delete userObject.refreshToken;
   return userObject;
 };
 

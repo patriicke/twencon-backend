@@ -1,29 +1,25 @@
 const express = require("express");
 const app = express();
-const rooms = ["general", "tech", "finance", "crypto"];
+const PORT = process.env.PORT || 5001;
+const server = require("http").createServer(app);
 const cors = require("cors");
+require("dotenv").config();
 const User = require("./models/Users");
 const Message = require("./models/Messages");
+const rooms = ["general", "tech", "finance", "crypto"];
 const userRoutes = require("./routes/userRoutes");
-require("dotenv").config();
+const corsOptions = require("./config/cors");
 app.use(express.urlencoded({ extended: true }));
 app.use(express.json());
-app.use(cors());
+app.use(cors(corsOptions));
 app.use("/auth", userRoutes);
 require("./config/connection");
-const server = require("http").createServer(app);
-const PORT = process.env.PORT || 5001;
 const io = require("socket.io")(server, {
-  cors: {
-    origin: "http://localhost:5173",
-    methods: ["GET", "POST"]
-  }
+  cors: corsOptions
 });
-
 app.get("/rooms", (req, res) => {
   res.json(rooms);
 });
-
 async function getLastMessagesFromRoom(room) {
   let roomMessages = await Message.aggregate([
     { $match: { to: room } },
@@ -31,7 +27,6 @@ async function getLastMessagesFromRoom(room) {
   ]);
   return roomMessages;
 }
-
 function sortRoomMessagesByDate(messages) {
   return messages.sort(function (a, b) {
     let date1 = a._id.split("/");
