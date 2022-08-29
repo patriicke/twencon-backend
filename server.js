@@ -5,13 +5,14 @@ const cors = require("cors");
 const User = require("./models/Users");
 const Message = require("./models/Messages");
 const userRoutes = require("./routes/userRoutes");
+require("dotenv").config();
 app.use(express.urlencoded({ extended: true }));
 app.use(express.json());
 app.use(cors());
 app.use("/auth", userRoutes);
 require("./config/connection");
 const server = require("http").createServer(app);
-const PORT = 5001;
+const PORT = process.env.PORT || 5001;
 const io = require("socket.io")(server, {
   cors: {
     origin: "http://localhost:5173",
