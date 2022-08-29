@@ -1,6 +1,7 @@
 const mongoose = require("mongoose");
+require("dotenv").config();
 const connectDb = mongoose
-  .connect("mongodb://localhost/chat")
+  .connect(process.env.PRODUCTION ? process.env.DB_HOST : process.env.DB_URL)
   .then(() => {
     console.log(`Database connected`);
   })

@@ -3,9 +3,10 @@ const User = require("./../models/Users");
 
 //create user
 
-router.post("/", async (req, res) => {
+router.post("/signup", async (req, res) => {
   try {
     const { email, fname, lname, password, profile, username } = req.body;
+    console.log(req.body);
     const user = await User.create({
       email,
       fname,
@@ -15,6 +16,7 @@ router.post("/", async (req, res) => {
       username
     });
     res.status(201).json(user);
+    return res.status(200).json({ message: "Data came" });
   } catch (error) {
     let msg;
     if (error.code == 11000) {
