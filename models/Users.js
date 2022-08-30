@@ -26,7 +26,8 @@ const UserSchema = new mongoose.Schema(
       required: [true, "Password can't be empty"]
     },
     profile: {
-      type: String
+      type: String,
+      default: "icon"
     },
     newMessages: {
       type: Object,
