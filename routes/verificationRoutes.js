@@ -9,7 +9,6 @@ require("dotenv").config();
 router.route("/create/verify").post(async (req, res) => {
   try {
     const { v_code, acc_token } = req.body;
-    console.log(req.body);
     if (!v_code)
       return res.status(400).json({ message: "Provide the details please" });
     if (acc_token == "undefined" || !acc_token)
@@ -27,7 +26,6 @@ router.route("/create/verify").post(async (req, res) => {
       process.env.REFRESH_TOKEN_SECRET
     );
     const user = await User.create({ ...foundUser, refreshToken });
-    console.log(user);
     return res.status(201).json({ user, acc_token });
   } catch (error) {
     console.log(error);

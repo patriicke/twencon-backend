@@ -97,7 +97,22 @@ router.post("/login", async (req, res) => {
     const user = await User.findByCredentials(email, password);
     user.status = "online";
     await user.save();
-    res.status(200).json(user);
+    const { _id, fullname, username, profile, status, telephone, newMessages } =
+      user;
+    const acc_token = jwt.sign(
+      {
+        _id,
+        fullname,
+        username,
+        profile,
+        status,
+        telephone,
+        newMessages,
+        email
+      },
+      process.env.ACCESS_TOKEN_SECRET
+    );
+    res.status(200).json({ acc_token });
   } catch (error) {
     res.status(400).json(error.message);
   }
