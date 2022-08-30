@@ -106,4 +106,20 @@ router.post("/login", async (req, res) => {
   }
 });
 
+//upload photo
+
+router.route("/upload").post(async (req, res) => {
+  try {
+    const { profile, email } = req.body;
+    if (!email) return res.status(400).json({ message: "No email provided" });
+    if (!profile)
+      return res.status(401).json({ message: "No profile image provided" });
+    await User.updateOne({ email }, { $set: { profile } });
+    return res.status(201).json({ message: "profile updated successfully" });
+  } catch (error) {
+    console.log(error);
+    return res.status(500);
+  }
+});
+
 module.exports = router;

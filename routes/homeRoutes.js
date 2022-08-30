@@ -16,14 +16,13 @@ router.route("/").post(async (req, res) => {
   const foundUser = await User.findOne({ email });
   if (!foundUser)
     return res.status(404).json({ message: "No user found please" });
-  const { profile, _id, fullname, userEmail, username, status, telephone } =
-    foundUser;
+  const { profile, _id, fullname, username, status, telephone } = foundUser;
   return res.status(200).json({
     foundUser: {
       profile,
       _id,
       fullname,
-      email: userEmail,
+      email,
       username,
       status,
       telephone
