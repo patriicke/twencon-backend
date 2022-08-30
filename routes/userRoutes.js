@@ -8,18 +8,22 @@ require("dotenv").config();
 
 router.post("/signup", async (req, res) => {
   try {
-    const { email, password, cpassword, username } = req.body;
+    const { email, password, cpassword, username, telephone } = req.body;
     if (password !== cpassword)
       return res.status(400).json({ message: "Passwords don't match" });
-    const user = await User.findOne({
+    const foundUserByEmail = await User.findOne({
       email
     });
-    if (user) {
+    if (foundUserByEmail) {
       return res.status(406).json({ message: "Email already exists" });
     }
-    const foundUser = await User.findOne({ username });
-    if (foundUser) {
+    const foundUserByUsername = await User.findOne({ username });
+    if (foundUserByUsername) {
       return res.status(406).json({ message: "Username already exists" });
+    }
+    const foundUserByTelephone = await User.findOne({ telephone });
+    if (foundUserByTelephone) {
+      return res.status(406).json({ message: "Telephone already exists" });
     }
     const verificationCode = Math.floor(
       Math.random() * (999999 - 100000) + 100000
@@ -51,12 +55,28 @@ router.post("/signup", async (req, res) => {
       { ...req.body },
       process.env.ACCESS_TOKEN_SECRET
     );
-    await createVerification.create({
-      acc_token: accessToken,
-      email,
-      verificationCode,
-      verificationReference:verificationCodeReference
+    const isVerificationEmailExist = await createVerification.findOne({
+      email: email
     });
+    if (isVerificationEmailExist == null) {
+      await createVerification.create({
+        acc_token: accessToken,
+        email,
+        verificationCode,
+        verificationReference: verificationCodeReference
+      });
+    } else {
+      await createVerification.updateOne(
+        { email },
+        {
+          $set: {
+            acc_token: accessToken,
+            verificationCode,
+            verificationReference: verificationCodeReference
+          }
+        }
+      );
+    }
     return res
       .status(201)
       .json({ v_reference: verificationCodeReference, accessToken });

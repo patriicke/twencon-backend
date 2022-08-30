@@ -8,11 +8,13 @@ const User = require("./models/Users");
 const Message = require("./models/Messages");
 const rooms = ["general", "tech", "finance", "crypto"];
 const userRoutes = require("./routes/userRoutes");
+const verificationRoutes = require("./routes/verificationRoutes");
 const corsOptions = require("./config/cors");
 app.use(express.urlencoded({ extended: true }));
 app.use(express.json());
 app.use(cors(corsOptions));
 app.use("/auth", userRoutes);
+app.use("/verification", verificationRoutes);
 require("./config/connection");
 const io = require("socket.io")(server, {
   cors: corsOptions

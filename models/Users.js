@@ -18,11 +18,12 @@ const UserSchema = new mongoose.Schema(
     },
     username: {
       type: String,
-      required: [true, "Telephone can't be empty"]
+      required: [true, "Username can't be empty"],
+      unique: true
     },
     password: {
       type: String,
-      required: [true, "Telephone can't be empty"]
+      required: [true, "Password can't be empty"]
     },
     profile: {
       type: String
@@ -37,7 +38,8 @@ const UserSchema = new mongoose.Schema(
     },
     telephone: {
       type: String,
-      required: [true, "telephone can't be empty"]
+      required: [true, "Telephone can't be empty"],
+      unique: true
     },
     refreshToken: {
       type: String
