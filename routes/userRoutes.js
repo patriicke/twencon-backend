@@ -5,7 +5,6 @@ const nodemailer = require("nodemailer");
 const createVerification = require("./../models/create-verification");
 require("dotenv").config();
 //create user
-
 router.post("/signup", async (req, res) => {
   try {
     const { email, password, cpassword, username, telephone } = req.body;
@@ -91,9 +90,7 @@ router.post("/signup", async (req, res) => {
     res.status(400).json(msg);
   }
 });
-
 //login user
-
 router.post("/login", async (req, res) => {
   try {
     const { email, password } = req.body;
@@ -105,9 +102,7 @@ router.post("/login", async (req, res) => {
     res.status(400).json(error.message);
   }
 });
-
 //upload photo
-
 router.route("/upload").post(async (req, res) => {
   try {
     const { profile, email } = req.body;
