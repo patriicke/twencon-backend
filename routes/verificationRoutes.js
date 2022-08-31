@@ -5,7 +5,6 @@ const createResetModel = require("./../models/reset-verifaction");
 const jwt = require("jsonwebtoken");
 const sendEmail = require("../controllers/sendEmail");
 require("dotenv").config();
-
 // create user verifcation
 router.route("/create/verify").post(async (req, res) => {
   try {

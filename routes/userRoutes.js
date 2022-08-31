@@ -113,9 +113,7 @@ router.route("/upload").post(async (req, res) => {
     return res.status(500);
   }
 });
-
 //reset user password
-
 router.route("/password/reset").post(async (req, res) => {
   try {
     const { reset_token, password } = req.body;
