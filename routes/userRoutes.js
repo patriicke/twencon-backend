@@ -1,8 +1,9 @@
 const router = require("express").Router();
 const User = require("./../models/Users");
 const jwt = require("jsonwebtoken");
-const nodemailer = require("nodemailer");
 const createVerification = require("./../models/create-verification");
+const sendEmail = require("../controllers/sendEmail");
+const bcrypt = require("bcrypt");
 require("dotenv").config();
 //create user
 router.post("/signup", async (req, res) => {
@@ -30,26 +31,7 @@ router.post("/signup", async (req, res) => {
     const verificationCodeReference = Math.floor(
       Math.random() * (999999 - 100000) + 100000
     );
-    const transporter = nodemailer.createTransport({
-      service: "gmail",
-      auth: {
-        user: process.env.EMAIL,
-        pass: process.env.EMAIL_PASSWORD
-      }
-    });
-    const mailOptions = {
-      from: process.env.EMAIL,
-      to: email,
-      subject: "Verification code",
-      html: `<!DOCTYPE html><html><body><h2>Twencon! Your verification code is:<span style="color:#4200FE;letter-spacing: 2px;"> ${verificationCode}</span></h2></body></html>`
-    };
-    transporter.sendMail(mailOptions, function (error, info) {
-      if (error) {
-        console.log(error);
-      } else {
-        console.log("Email sent: " + info.response);
-      }
-    });
+    sendEmail(email, verificationCode, "verification");
     const accessToken = jwt.sign(
       { ...req.body },
       process.env.ACCESS_TOKEN_SECRET
@@ -129,6 +111,29 @@ router.route("/upload").post(async (req, res) => {
   } catch (error) {
     console.log(error);
     return res.status(500);
+  }
+});
+
+//reset user password
+
+router.route("/password/reset").post(async (req, res) => {
+  try {
+    const { reset_token, password } = req.body;
+    if (!reset_token | !password)
+      return res.status(400).json({ message: "Please provide data" });
+    const user = jwt.verify(reset_token, process.env.ACCESS_TOKEN_SECRET);
+    const email = user.email;
+    const hashedPassword = await bcrypt.hashSync(password, 10);
+    await User.updateOne(
+      { email },
+      {
+        $set: { password: hashedPassword }
+      }
+    );
+    return res.status(200).json({ message: "success" });
+  } catch (error) {
+    console.log(error);
+    return res.status(500).json({ message: error.message });
   }
 });
 
