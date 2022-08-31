@@ -1,8 +1,10 @@
 const router = require("express").Router();
 const User = require("./../models/Users");
-const createVerification = require("./../models/create-verification");
+const createVerificationModel = require("./../models/create-verification");
+const createResetModel = require("./../models/reset-verifaction");
 const nodemailer = require("nodemailer");
 const jwt = require("jsonwebtoken");
+const sendEmail = require("../controllers/sendEmail");
 require("dotenv").config();
 
 // create user verifcation
@@ -15,7 +17,7 @@ router.route("/create/verify").post(async (req, res) => {
       return res.status(400).json({ message: "Provide the details please" });
     const foundUser = jwt.verify(acc_token, process.env.ACCESS_TOKEN_SECRET);
     delete foundUser.iat;
-    const isVerificationExist = await createVerification.findOne({
+    const isVerificationExist = await createVerificationModel.findOne({
       email: foundUser.email,
       verificationCode: v_code
     });
@@ -39,7 +41,7 @@ router.route("/create/resend").post(async (req, res) => {
     console.log(req.body);
     if (v_reference === "undefined" || !v_reference)
       return res.status(403).json({ message: "No reference code given" });
-    foundUser = await createVerification.findOne({
+    foundUser = await createVerificationModel.findOne({
       verificationReference: v_reference
     });
     if (!foundUser)
@@ -50,27 +52,8 @@ router.route("/create/resend").post(async (req, res) => {
     const verificationCodeReference = Math.floor(
       Math.random() * (999999 - 100000) + 100000
     );
-    const transporter = nodemailer.createTransport({
-      service: "gmail",
-      auth: {
-        user: process.env.EMAIL,
-        pass: process.env.EMAIL_PASSWORD
-      }
-    });
-    const mailOptions = {
-      from: process.env.EMAIL,
-      to: foundUser.email,
-      subject: "Verification code",
-      html: `<!DOCTYPE html><html><body><h2>Twencon! Your verification code is:<span style="color:#4200FE;letter-spacing: 2px;"> ${verificationCode}</span></h2></body></html>`
-    };
-    transporter.sendMail(mailOptions, function (error, info) {
-      if (error) {
-        console.log(error);
-      } else {
-        console.log("Email sent: " + info.response);
-      }
-    });
-    await createVerification.updateOne(
+    sendEmail(foundUser.email, verificationCode, "verification");
+    await createVerificationModel.updateOne(
       { email: foundUser.email },
       {
         $set: {
@@ -91,8 +74,21 @@ router.route("/reset").post(async (req, res) => {
   if (!email)
     return res.status(400).json({ message: "Please provide  your email" });
   const foundUser = await User.findOne({ email });
-  if(!foundUser) return res.status(404).json({message: "Please signup no user with this email"})
-  console.log(email);
+  if (!foundUser)
+    return res
+      .status(404)
+      .json({ message: "Please signup no user with this email" });
+  const resetCode = Math.floor(Math.random() * (999999 - 100000) + 100000);
+  const resetReferenceCode = Math.floor(
+    Math.random() * (999999 - 100000) + 100000
+  );
+  sendEmail(email, resetCode, "reset");
+  await createResetModel.create({
+    email,
+    resetCode,
+    resetReferenceCode
+  });
+  return res.status(201).json({ r_reference: resetReferenceCode });
 });
 
 router.route("/reset/verify").post(async (req, res) => {
@@ -104,7 +100,7 @@ router.route("/reset/verify").post(async (req, res) => {
       return res.status(400).json({ message: "Provide the details please" });
     const foundUser = jwt.verify(acc_token, process.env.ACCESS_TOKEN_SECRET);
     delete foundUser.iat;
-    const isVerificationExist = await createVerification.findOne({
+    const isVerificationExist = await createVerificationModel.findOne({
       email: foundUser.email,
       verificationCode: v_code
     });
@@ -128,7 +124,7 @@ router.route("/reset/resend").post(async (req, res) => {
     console.log(req.body);
     if (v_reference === "undefined" || !v_reference)
       return res.status(403).json({ message: "No reference code given" });
-    foundUser = await createVerification.findOne({
+    foundUser = await createVerificationModel.findOne({
       verificationReference: v_reference
     });
     if (!foundUser)
@@ -159,7 +155,7 @@ router.route("/reset/resend").post(async (req, res) => {
         console.log("Email sent: " + info.response);
       }
     });
-    await createVerification.updateOne(
+    await createVerificationModel.updateOne(
       { email: foundUser.email },
       {
         $set: {
