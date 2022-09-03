@@ -10,6 +10,7 @@ const rooms = ["general", "tech", "finance", "crypto"];
 const userRoutes = require("./routes/userRoutes");
 const verificationRoutes = require("./routes/verificationRoutes");
 const homeRoutes = require("./routes/homeRoutes");
+const notificationRoutes = require("./routes/notificationRoutes");
 const corsOptions = require("./config/cors");
 app.use(express.urlencoded({ extended: true }));
 app.use(express.json());
@@ -17,6 +18,7 @@ app.use(cors(corsOptions));
 app.use("/auth", userRoutes);
 app.use("/verification", verificationRoutes);
 app.use("/home", homeRoutes);
+app.use("/notifications", notificationRoutes);
 require("./config/connection");
 const io = require("socket.io")(server, {
   cors: corsOptions
@@ -70,6 +72,62 @@ io.on("connection", (socket) => {
     //send message to room
     io.to(room).emit("room-messages", roomMessages);
     socket.broadcast.emit("notifications", room);
+
+    if (room.length > 10) {
+      const receiver = room.split("-").filter((data) => {
+        return data !== sender._id;
+      })[0];
+      const user = await User.findById(receiver);
+      if (user.newMessages[room]) {
+        await User.updateOne(
+          { email: user.email },
+          {
+            $set: {
+              newMessages: {
+                ...user.newMessages,
+                [room]: user.newMessages[room] + 1
+              }
+            }
+          }
+        );
+      } else {
+        await User.updateOne(
+          { email: user.email },
+          {
+            $set: { newMessages: { ...user.newMessages, [room]: 1 } }
+          }
+        );
+      }
+    } else {
+      await (
+        await User.find()
+      ).forEach(async (item) => {
+        const current = item.newMessages[room];
+        if (item.email !== sender.email)
+          if (current) {
+            await User.updateOne(
+              { email: item.email },
+              {
+                $set: {
+                  newMessages: {
+                    ...item.newMessages,
+                    [room]: item.newMessages[room] + 1
+                  }
+                }
+              }
+            );
+          } else {
+            await User.updateOne(
+              { email: item.email },
+              {
+                $set: {
+                  newMessages: { ...item.newMessages, [room]: 1 }
+                }
+              }
+            );
+          }
+      });
+    }
   });
 
   app.delete("/logout", async (req, res) => {
