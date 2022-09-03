@@ -72,7 +72,6 @@ io.on("connection", (socket) => {
     //send message to room
     io.to(room).emit("room-messages", roomMessages);
     socket.broadcast.emit("notifications", room);
-
     if (room.length > 10) {
       const receiver = room.split("-").filter((data) => {
         return data !== sender._id;
@@ -102,8 +101,8 @@ io.on("connection", (socket) => {
       await (
         await User.find()
       ).forEach(async (item) => {
-        const current = item.newMessages[room];
-        if (item.email !== sender.email)
+        if (item.email !== sender.email) {
+          const current = item.newMessages[room];
           if (current) {
             await User.updateOne(
               { email: item.email },
@@ -126,6 +125,7 @@ io.on("connection", (socket) => {
               }
             );
           }
+        }
       });
     }
   });
