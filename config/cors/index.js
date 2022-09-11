@@ -1,10 +1,10 @@
-const whitelist = require("./../origins/origins");
-
+const whitelist = ["https://twenconi.vercel.app", "http://localhost:5173"];
 const corsOptions = {
   origin: (origin, callback) => {
     if (whitelist.indexOf(origin) !== -1) {
       callback(null, true);
     } else {
+      console.log(origin);
       callback(new Error("Not allowed by CORS"));
     }
   },
