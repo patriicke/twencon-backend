@@ -20,7 +20,7 @@ app.use("/auth", userRoutes);
 app.use("/verification", verificationRoutes);
 app.use("/home", homeRoutes);
 app.use("/notifications", notificationRoutes);
-app.use("/posts", postRoutes);
+app.use("/post", postRoutes);
 require("./config/connection");
 const io = require("socket.io")(server, {
   cors: corsOptions
@@ -44,7 +44,6 @@ function sortRoomMessagesByDate(messages) {
     return date1 < date2 ? -1 : 1;
   });
 }
-
 //socket connections
 
 io.on("connection", (socket) => {
