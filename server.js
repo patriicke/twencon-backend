@@ -13,6 +13,7 @@ const homeRoutes = require("./routes/homeRoutes");
 const notificationRoutes = require("./routes/notificationRoutes");
 const corsOptions = require("./config/cors");
 const postRoutes = require("./routes/postRoutes");
+const likeRoutes = require("./routes/likeRoutes");
 app.use(express.urlencoded({ extended: true }));
 app.use(express.json());
 app.use(cors(corsOptions));
@@ -21,6 +22,7 @@ app.use("/verification", verificationRoutes);
 app.use("/home", homeRoutes);
 app.use("/notifications", notificationRoutes);
 app.use("/post", postRoutes);
+app.use("/like", likeRoutes);
 require("./config/connection");
 const io = require("socket.io")(server, {
   cors: corsOptions
