@@ -13,7 +13,9 @@ const homeRoutes = require("./routes/homeRoutes");
 const notificationRoutes = require("./routes/notificationRoutes");
 const corsOptions = require("./config/cors");
 const postRoutes = require("./routes/postRoutes");
-const likeRoutes = require("./routes/likeRoutes");
+const like = require("./controllers/like.js");
+const Posts = require("./models/Posts");
+const post = require("./controllers/post");
 app.use(express.urlencoded({ extended: true }));
 app.use(express.json());
 app.use(cors(corsOptions));
@@ -22,7 +24,6 @@ app.use("/verification", verificationRoutes);
 app.use("/home", homeRoutes);
 app.use("/notifications", notificationRoutes);
 app.use("/post", postRoutes);
-app.use("/like", likeRoutes);
 require("./config/connection");
 const io = require("socket.io")(server, {
   cors: corsOptions
@@ -133,20 +134,14 @@ io.on("connection", (socket) => {
     }
   });
 
-  app.delete("/logout", async (req, res) => {
-    try {
-      const { _id, newMessages } = req.body;
-      const user = await User.findById(_id);
-      user.status = "offline";
-      user.newMessages = newMessages;
-      await user.save();
-      const members = await User.find();
-      socket.broadcast.emit("new-user", members);
-      res.status(200).send();
-    } catch (error) {
-      console.log(error);
-      return res.status(500).send();
-    }
+  socket.on("like-post", async (user, _id) => {
+    const updatedPosts = await like(user, _id);
+    io.emit("like", updatedPosts);
+  });
+
+  socket.on("create-post", async (currentPost) => {
+    const updatedPosts = await post(currentPost);
+    io.emit("post", updatedPosts);
   });
 });
 

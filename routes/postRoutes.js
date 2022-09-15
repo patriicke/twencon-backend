@@ -14,15 +14,4 @@ router
       return res.status(500).json(error);
     }
   })
-  .post(async (req, res) => {
-    try {
-      const { post, owner, date } = req.body;
-      await Posts.create({ post, owner, date });
-      return res.status(200).send({ message: "post created" });
-    } catch (error) {
-      console.log(error);
-      return res.status(500).json(error);
-    }
-  });
-
 module.exports = router;
