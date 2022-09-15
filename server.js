@@ -14,8 +14,8 @@ const notificationRoutes = require("./routes/notificationRoutes");
 const corsOptions = require("./config/cors");
 const postRoutes = require("./routes/postRoutes");
 const like = require("./controllers/like.js");
-const Posts = require("./models/Posts");
 const post = require("./controllers/post");
+const createComment = require("./controllers/comment");
 app.use(express.urlencoded({ extended: true }));
 app.use(express.json());
 app.use(cors(corsOptions));
@@ -142,6 +142,15 @@ io.on("connection", (socket) => {
   socket.on("create-post", async (currentPost) => {
     const updatedPosts = await post(currentPost);
     io.emit("post", updatedPosts);
+  });
+
+  socket.on("create-comment", async (user, _id, comment, date) => {
+    try {
+      const updatedPost = await createComment(user, _id, comment, date);
+      io.emit("comment", updatedPost);
+    } catch (error) {
+      console.log(error);
+    }
   });
 });
 
