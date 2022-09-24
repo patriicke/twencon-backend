@@ -154,8 +154,8 @@ io.on("connection", (socket) => {
     }
   });
 
-  socket.on("start-follow", async (user, friend, date) => {
-    const updatedUser = await follow(user, friend, date);
+  socket.on("start-follow", async (user, friend) => {
+    const updatedUser = await follow(user, friend);
     io.emit("follow", updatedUser);
   });
 });
