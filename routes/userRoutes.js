@@ -5,6 +5,18 @@ const createVerification = require("./../models/create-verification");
 const sendEmail = require("../controllers/sendEmail");
 const bcrypt = require("bcrypt");
 require("dotenv").config();
+//Get user
+router.post("/user", async (req, res) => {
+  try {
+    const { username } = req.body;
+    const foundUser = await User.findOne({ username });
+    if (!foundUser)
+      return res.status(404).json({ message: "user is not found" });
+    return res.status(200).json({ foundUser });
+  } catch (error) {
+    return res.status(500).json({ message: "Internal server error" });
+  }
+});
 //create user
 router.post("/signup", async (req, res) => {
   try {

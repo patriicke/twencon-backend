@@ -15,4 +15,4 @@ const comment = async (user, _id, textComment, date) => {
   }
 };
 
-module.exports = comment;
+  module.exports = comment;

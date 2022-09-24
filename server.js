@@ -75,7 +75,7 @@ io.on("connection", (socket) => {
     roomMessages = sortRoomMessagesByDate(roomMessages);
     //send message to room
     io.to(room).emit("room-messages", roomMessages);
-    socket.broadcast.emit("notifications", room);
+    socket.broadcast.emit("notifications", room, roomMessages);
     if (room.length > 10) {
       const receiver = room.split("-").filter((data) => {
         return data !== sender._id;
