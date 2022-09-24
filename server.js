@@ -16,6 +16,7 @@ const postRoutes = require("./routes/postRoutes");
 const like = require("./controllers/like.js");
 const post = require("./controllers/post");
 const createComment = require("./controllers/comment");
+const follow = require("./controllers/follow");
 app.use(express.urlencoded({ extended: true }));
 app.use(express.json());
 app.use(cors(corsOptions));
@@ -151,6 +152,11 @@ io.on("connection", (socket) => {
     } catch (error) {
       console.log(error);
     }
+  });
+
+  socket.on("start-follow", async (user, friend, date) => {
+    const updatedUser = await follow(user, friend, date);
+    io.emit("follow", updatedUser);
   });
 });
 

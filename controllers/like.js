@@ -3,7 +3,6 @@ const Posts = require("./../models/Posts");
 const like = async (user, _id) => {
   try {
     const post = await Posts.findById(_id);
-    
     const userExist = post.likes.find((currentUser) => {
       return currentUser._id === user._id;
     });
