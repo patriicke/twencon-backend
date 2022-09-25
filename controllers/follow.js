@@ -20,7 +20,7 @@ const follow = async (user, friend) => {
         { _id: friendAccount._id },
         { $set: { followers: friendAccount.followers } }
       );
-      return { message: "followed", data: { userAccount, friendAccount } };
+      return { message: "followed", users: await User.find() };
     } else {
       const updatedUserAccount = userAccount.following.filter((currentUser) => {
         return currentUser.email !== friendAccount.email;
@@ -38,11 +38,11 @@ const follow = async (user, friend) => {
         { email: friendAccount.email },
         { $set: { followers: updateFriendAccount } }
       );
-      return { message: "unfollowed", data: { userAccount, friendAccount } };
+      return { message: "unfollowed", users: await User.find() };
     }
   } catch (error) {
     console.log(error);
   }
-};  
+};
 
 module.exports = follow;
