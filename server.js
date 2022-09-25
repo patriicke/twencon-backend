@@ -153,7 +153,6 @@ io.on("connection", (socket) => {
       console.log(error);
     }
   });
-
   socket.on("start-follow", async (user, friend) => {
     const updatedUser = await follow(user, friend);
     io.emit("follow", updatedUser);

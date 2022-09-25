@@ -14,4 +14,15 @@ router
       return res.status(500).json(error);
     }
   })
+  .post(async (req, res) => {
+    try {
+      const { postId } = req.body;
+      return res
+        .status(200)
+        .json({ post: await Posts.findById(postId.postId) });
+    } catch (error) {
+      console.log(error);
+      return res.status(500).json({ message: error.message });
+    }
+  });
 module.exports = router;
