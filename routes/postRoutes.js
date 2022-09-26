@@ -25,4 +25,14 @@ router
       return res.status(500).json({ message: error.message });
     }
   });
+router.route("/delete").post(async (req, res) => {
+  try {
+    const { postId } = req.body;
+    await Posts.findByIdAndDelete(postId);
+    return res.status(200).json({ posts: await Posts.find() });
+  } catch (error) {
+    console.log(error);
+    return res.status(error.message);
+  }
+});
 module.exports = router;
