@@ -17,6 +17,7 @@ const like = require("./controllers/like.js");
 const post = require("./controllers/post");
 const createComment = require("./controllers/comment");
 const follow = require("./controllers/follow");
+const Posts = require("./models/Posts");
 app.use(express.urlencoded({ extended: true }));
 app.use(express.json());
 app.use(cors(corsOptions));
@@ -156,6 +157,9 @@ io.on("connection", (socket) => {
   socket.on("start-follow", async (user, friend) => {
     const updatedUser = await follow(user, friend);
     io.emit("follow", updatedUser);
+  });
+  socket.on("delete-post", async () => {
+    io.emit("updated-posts", await Posts.find());
   });
 });
 
