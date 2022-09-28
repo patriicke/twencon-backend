@@ -1,21 +1,21 @@
 const Posts = require("./../models/Posts");
 
-const like = async (user, _id) => {
+const like = async (user, postId) => {
   try {
-    const post = await Posts.findById(_id);
+    const post = await Posts.findById(postId);
     const userExist = post.likes.find((currentUser) => {
-      return currentUser._id === user._id;
+      return currentUser._id === user?.id;
     });
     if (!userExist) {
       post.likes.push(user);
-      await Posts.updateOne({ _id }, { $set: { likes: post.likes } });
+      await Posts.updateOne({ _id: postId }, { $set: { likes: post.likes } });
       return { message: "liked", post };
     }
     const updatedPost = post.likes.filter((currentUser) => {
-      return currentUser._id !== user._id;
+      return currentUser.id !== user.id;
     });
-    await Posts.updateOne({ _id }, { $set: { likes: updatedPost } });
-    return { message: "unliked", post: await Posts.findById(_id) };
+    await Posts.updateOne({ _id: postId }, { $set: { likes: updatedPost } });
+    return { message: "unliked", post: await Posts.findById(postId) };
   } catch (error) {
     console.log(error);
   }

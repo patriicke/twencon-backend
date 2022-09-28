@@ -2,7 +2,7 @@ const mongoose = require("mongoose");
 
 const MessageSchema = new mongoose.Schema({
   content: String,
-  from: Object,
+  from: String,
   socketId: String,
   time: String,
   date: String,

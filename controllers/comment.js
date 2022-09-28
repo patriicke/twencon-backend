@@ -1,18 +1,24 @@
 const Posts = require("./../models/Posts");
 
-const comment = async (user, _id, textComment, date) => {
+const comment = async (userId, postId, textComment, date) => {
   try {
-    const post = await Posts.findById(_id);
+    const post = await Posts.findById(postId);
     post.comments.push({
       content: textComment,
-      from: user,
+      from: userId,
       date
     });
-    await Posts.updateOne({ _id }, { $set: { comments: post.comments } });
-    return { message: "commented on a post", post: await Posts.findById(_id) };
+    await Posts.updateOne(
+      { _id: postId },
+      { $set: { comments: post.comments } }
+    );
+    return {
+      message: "commented on a post",
+      post: await Posts.findById(postId)
+    };
   } catch (error) {
     console.log(error);
   }
 };
 
-  module.exports = comment;
+module.exports = comment;

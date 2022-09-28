@@ -136,8 +136,8 @@ io.on("connection", (socket) => {
     }
   });
 
-  socket.on("like-post", async (user, _id) => {
-    const updatedPosts = await like(user, _id);
+  socket.on("like-post", async (user, postId) => {
+    const updatedPosts = await like(user, postId);
     io.emit("like", updatedPosts);
   });
 
@@ -146,9 +146,9 @@ io.on("connection", (socket) => {
     io.emit("post", updatedPosts);
   });
 
-  socket.on("create-comment", async (user, _id, comment, date) => {
+  socket.on("create-comment", async (userId, postId, comment, date) => {
     try {
-      const updatedPost = await createComment(user, _id, comment, date);
+      const updatedPost = await createComment(userId, postId, comment, date);
       io.emit("comment", updatedPost);
     } catch (error) {
       console.log(error);

@@ -2,12 +2,12 @@ const User = require("./../models/Users");
 
 const follow = async (user, friend) => {
   try {
-    const userId = user._id;
-    const friendId = friend._id;
+    const userId = user.id;
+    const friendId = friend.id;
     const userAccount = await User.findById(userId);
     const friendAccount = await User.findById(friendId);
     const followExist = userAccount.following.find((currentUser) => {
-      return currentUser.email == friendAccount.email;
+      return currentUser.id == friendAccount._id;
     });
     if (!followExist) {
       userAccount.following.push(friend);
@@ -23,19 +23,19 @@ const follow = async (user, friend) => {
       return { message: "followed", users: await User.find() };
     } else {
       const updatedUserAccount = userAccount.following.filter((currentUser) => {
-        return currentUser.email !== friendAccount.email;
+        return currentUser.id !== friendAccount._id;
       });
       const updateFriendAccount = friendAccount.followers.filter(
         (currentUser) => {
-          return currentUser.email !== userAccount.email;
+          return currentUser.id !== userAccount._id;
         }
       );
       await User.updateOne(
-        { email: userAccount.email },
+        { _id: userAccount._id },
         { $set: { following: updatedUserAccount } }
       );
       await User.updateOne(
-        { email: friendAccount.email },
+        { _id: friendAccount._id },
         { $set: { followers: updateFriendAccount } }
       );
       return { message: "unfollowed", users: await User.find() };
