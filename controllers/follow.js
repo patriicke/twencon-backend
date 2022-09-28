@@ -7,7 +7,7 @@ const follow = async (user, friend) => {
     const userAccount = await User.findById(userId);
     const friendAccount = await User.findById(friendId);
     const followExist = userAccount.following.find((currentUser) => {
-      return currentUser.id == friendAccount._id;
+      return currentUser.id == friendId;
     });
     if (!followExist) {
       userAccount.following.push(friend);
@@ -23,11 +23,11 @@ const follow = async (user, friend) => {
       return { message: "followed", users: await User.find() };
     } else {
       const updatedUserAccount = userAccount.following.filter((currentUser) => {
-        return currentUser.id !== friendAccount._id;
+        return currentUser.id !== friendId;
       });
       const updateFriendAccount = friendAccount.followers.filter(
         (currentUser) => {
-          return currentUser.id !== userAccount._id;
+          return currentUser.id !== userId;
         }
       );
       await User.updateOne(

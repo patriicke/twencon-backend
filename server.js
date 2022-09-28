@@ -6,7 +6,7 @@ const cors = require("cors");
 require("dotenv").config();
 const User = require("./models/Users");
 const Message = require("./models/Messages");
-const rooms = ["general", "tech", "finance", "crypto"];
+const rooms = ["general", "announcements", "advertisement"];
 const userRoutes = require("./routes/userRoutes");
 const verificationRoutes = require("./routes/verificationRoutes");
 const homeRoutes = require("./routes/homeRoutes");
@@ -50,7 +50,6 @@ function sortRoomMessagesByDate(messages) {
   });
 }
 //socket connections
-
 io.on("connection", (socket) => {
   socket.on("new-user", async () => {
     const members = await User.find();
