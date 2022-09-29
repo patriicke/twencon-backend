@@ -4,7 +4,7 @@ const like = async (user, postId) => {
   try {
     const post = await Posts.findById(postId);
     const userExist = post.likes.find((currentUser) => {
-      return currentUser._id === user?.id;
+      return currentUser.id === user?.id;
     });
     if (!userExist) {
       post.likes.push(user);
