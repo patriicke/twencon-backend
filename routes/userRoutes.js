@@ -155,5 +155,36 @@ router.route("/password/reset").post(async (req, res) => {
     return res.status(500).json({ message: error.message });
   }
 });
+router.route("/password/update").post(async (req, res) => {
+  try {
+    const { email, password, currentPassword } = req.body;
+    const salt = await bcrypt.genSalt(10);
+    if (password == null)
+      return res.status(403).json({ message: "no password" });
+    const foudUser = await User.findOne({ email });
+    if (foudUser == null)
+      return res.status(404).json({ message: "User not found" });
+    if (!(await bcrypt.compare(currentPassword, foudUser.password)))
+      return res.status(403).json({ message: "password don't match" });
+    if (currentPassword == password)
+      return res
+        .status(400)
+        .json({ message: "use password different from previous one" });
+    const updateUser = await User.updateOne(
+      { email },
+      { $set: { password: await bcrypt.hash(password, salt) } }
+    );
+    if (!updateUser)
+      return res
+        .status(403)
+        .json({ message: "an error occured while updating user" });
+
+    return res
+      .status(201)
+      .json({ message: "user password updated successfully" });
+  } catch (error) {
+    console.log(error);
+  }
+});
 
 module.exports = router;
