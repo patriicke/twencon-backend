@@ -9,13 +9,17 @@ const like = async (user, postId) => {
     if (!userExist) {
       post.likes.push(user);
       await Posts.updateOne({ _id: postId }, { $set: { likes: post.likes } });
-      return { message: "liked", post };
+      return { message: "liked", post, liker: user?.id };
     }
     const updatedPost = post.likes.filter((currentUser) => {
       return currentUser.id !== user.id;
     });
     await Posts.updateOne({ _id: postId }, { $set: { likes: updatedPost } });
-    return { message: "unliked", post: await Posts.findById(postId) };
+    return {
+      message: "unliked",
+      post: await Posts.findById(postId),
+      liker: user?.id
+    };
   } catch (error) {
     console.log(error);
   }
