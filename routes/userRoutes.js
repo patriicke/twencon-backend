@@ -127,8 +127,11 @@ router.route("/upload").post(async (req, res) => {
     if (!email) return res.status(400).json({ message: "No email provided" });
     if (!profile)
       return res.status(401).json({ message: "No profile image provided" });
-    await User.updateOne({ email }, { $set: { profile } });
-    return res.status(201).json({ message: "profile updated successfully" });
+    let updatedUser = await User.findOneAndUpdate(
+      { email },
+      { $set: { profile } }
+    );
+    return res.status(201).json({ updatedUser });
   } catch (error) {
     console.log(error);
     return res.status(500);
@@ -184,6 +187,27 @@ router.route("/password/update").post(async (req, res) => {
       .json({ message: "user password updated successfully" });
   } catch (error) {
     console.log(error);
+  }
+});
+router.route("/user/update").post(async (req, res) => {
+  try {
+    const { user } = req.body;
+    if (!user) return res.status(400).json({ message: "no user provided" });
+    let updateUser = await User.findOneAndUpdate(
+      { _id: user._id },
+      {
+        $set: {
+          fullname: user.fullname,
+          username: user.username,
+          telephone: user.telephone,
+          profile: user.profile
+        }
+      }
+    );
+    return res.status(200).json(updateUser);
+  } catch (error) {
+    console.log(error);
+    return res.status(500).json({ message: error.message });
   }
 });
 
