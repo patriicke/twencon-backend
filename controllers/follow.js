@@ -20,7 +20,11 @@ const follow = async (user, friend) => {
         { _id: friendAccount._id },
         { $set: { followers: friendAccount.followers } }
       );
-      return { message: "followed", users: await User.find() };
+      return {
+        message: "followed",
+        users: await User.find(),
+        follower: userId
+      };
     } else {
       const updatedUserAccount = userAccount.following.filter((currentUser) => {
         return currentUser.id !== friendId;
@@ -38,7 +42,11 @@ const follow = async (user, friend) => {
         { _id: friendAccount._id },
         { $set: { followers: updateFriendAccount } }
       );
-      return { message: "unfollowed", users: await User.find() };
+      return {
+        message: "unfollowed",
+        users: await User.find(),
+        follower: userId
+      };
     }
   } catch (error) {
     console.log(error);
