@@ -20,7 +20,11 @@ const follow = require("./controllers/follow");
 const Posts = require("./models/Posts");
 app.use(express.urlencoded({ extended: true }));
 app.use(express.json());
-app.use(cors(corsOptions));
+try {
+  app.use(cors(corsOptions));
+} catch (error) {
+  console.log(error);
+}
 app.use("/auth", userRoutes);
 app.use("/verification", verificationRoutes);
 app.use("/home", homeRoutes);
